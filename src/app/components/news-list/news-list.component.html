@@ -1,0 +1,63 @@
+<div class="d-flex justify-content-between align-items-center mb-4 page-header shadow-sm">
+  <div>
+    <h2 class="mb-0 fw-bold text-primary d-flex align-items-center gap-2">
+      <span>📰</span> News Feed
+    </h2>
+    <p class="text-muted mb-0 small mt-1">Stay updated with the latest stories</p>
+  </div>
+  <div class="d-flex align-items-center gap-3">
+    <div class="d-none d-md-block">
+      <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
+        👤 {{loggedUser?.name || 'Guest'}}
+      </span>
+    </div>
+    <a class="btn btn-success action-btn shadow-sm" routerLink="/news/create">
+      <span>➕</span> Create News
+    </a>
+  </div>
+</div>
+
+<div class="mb-5">
+  <div class="position-relative">
+    <input [(ngModel)]="searchText" class="form-control form-control-lg search-input"
+      placeholder="Search news by title...">
+  </div>
+</div>
+
+@for (item of filteredNews() | paginate: { itemsPerPage: 5, currentPage: page }; track item.id) {
+<div class="card mb-4 shadow-sm news-card">
+  <div class="card-body p-4">
+    <div class="d-flex justify-content-between align-items-start mb-3">
+      <h5 class="card-title mb-0">{{item.title}}</h5>
+      <span class="badge bg-light text-secondary border">ID: {{item.id}}</span>
+    </div>
+
+    <div class="meta-info mb-3 pb-3 border-bottom">
+      <span class="me-3">👤 By <strong>{{getAuthorName(item.author_id)}}</strong></span>
+      <span>💬 {{item.comments?.length || 0}} comments</span>
+    </div>
+
+    <p class="card-text text-secondary mb-4" style="line-height: 1.7;">
+      {{item.title}}... <span class="text-muted fst-italic">(Click details for full story)</span>
+    </p>
+
+    <div class="d-flex gap-2">
+      <a class="btn btn-primary btn-sm action-btn" [routerLink]="['/news', item.id]">
+        View Details
+      </a>
+      @if (canEdit(item)) {
+      <a class="btn btn-warning btn-sm action-btn text-white" [routerLink]="['/news/edit', item.id]">
+        <span>✏️</span> Edit
+      </a>
+      <button class="btn btn-danger btn-sm action-btn" (click)="delete(item.id)">
+        <span>🗑️</span> Delete
+      </button>
+      }
+    </div>
+  </div>
+</div>
+}
+
+<div class="d-flex justify-content-center mt-5">
+  <pagination-controls (pageChange)="page = $event" class="custom-pagination"></pagination-controls>
+</div>

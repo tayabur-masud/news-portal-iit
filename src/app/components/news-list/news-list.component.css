@@ -1,0 +1,61 @@
+.news-card {
+    border: none;
+    border-left: 4px solid #0d6efd;
+    border-radius: 12px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background: white;
+}
+
+.news-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.card-title {
+    font-weight: 700;
+    color: #1f2937;
+    letter-spacing: -0.5px;
+    font-size: 1.25rem;
+}
+
+.meta-info {
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-style: italic;
+}
+
+.search-input {
+    border-radius: 50px;
+    padding-left: 1.5rem;
+    border: 1px solid #e5e7eb;
+    background-color: #f9fafb;
+    transition: all 0.2s;
+}
+
+.search-input:focus {
+    background-color: white;
+    box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
+    border-color: #0d6efd;
+    outline: none;
+}
+
+.action-btn {
+    border-radius: 8px;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+}
+
+.action-btn:hover {
+    transform: translateY(-1px);
+}
+
+.page-header {
+    background: linear-gradient(to right, #ffffff, #f8f9fa);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid #e9ecef;
+}
