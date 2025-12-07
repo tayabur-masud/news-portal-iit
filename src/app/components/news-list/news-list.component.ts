@@ -22,6 +22,7 @@ export class NewsListComponent implements OnInit {
 
   _searchText = '';
   page = 1;
+  limit = 2;
   totalItems = 0;
 
   get searchText(): string {
@@ -57,7 +58,7 @@ export class NewsListComponent implements OnInit {
   }
 
   loadNews(): void {
-    this.newsService.getAllWithPagination(this.page, this.searchText).subscribe({
+    this.newsService.getAllWithPagination(this.page, this.limit, this.searchText).subscribe({
       next: (resp) => {
         this._news = resp.body || [];
         this.totalItems = Number(resp.headers.get('X-Total-Count')) || 0;

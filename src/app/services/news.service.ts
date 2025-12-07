@@ -10,8 +10,8 @@ export class NewsService {
 
   getAll(): Observable<any[]> { return this.http.get<any[]>(this.newsUrl); }
 
-  getAllWithPagination(page: number, search: string = ''): Observable<any> {
-    let params: any = { _page: page, _limit: 2 };
+  getAllWithPagination(page: number, limit: number, search: string = ''): Observable<any> {
+    let params: any = { _page: page, _limit: limit };
     if (search) {
       params['q'] = search;
     }
