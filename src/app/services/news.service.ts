@@ -10,6 +10,17 @@ export class NewsService {
 
   getAll(): Observable<any[]> { return this.http.get<any[]>(this.newsUrl); }
 
+  getAllWithPagination(page: number, search: string = ''): Observable<any> {
+    let params: any = { _page: page, _limit: 2 };
+    if (search) {
+      params['q'] = search;
+    }
+    return this.http.get<any[]>(this.newsUrl, {
+      params,
+      observe: 'response'
+    });
+  }
+
   getById(id: number): Observable<any> { return this.http.get<any>(`${this.newsUrl}/${id}`); }
 
   create(news: any): Observable<any> { return this.http.post(this.newsUrl, news); }

@@ -16,12 +16,23 @@ import { forkJoin } from 'rxjs';
   styleUrl: './news-list.component.css'
 })
 export class NewsListComponent implements OnInit {
-  news: any[] = [];
+  _news: any[] = [];
   usersMap = new Map<number, string>();
   loggedUser: any | null = null;
 
-  searchText = '';
+  _searchText = '';
   page = 1;
+  totalItems = 0;
+
+  get searchText(): string {
+    return this._searchText;
+  }
+
+  set searchText(value: string) {
+    this._searchText = value;
+    this.page = 1; // Reset to first page on search
+    this.loadNews();
+  }
 
   constructor(
     private newsService: NewsService,
@@ -33,33 +44,43 @@ export class NewsListComponent implements OnInit {
   ngOnInit(): void {
     this.loggedUser = this.auth.getLoggedUser();
 
-    // Load users first, then news — ensures users map is populated before rendering
-    forkJoin([
-      this.usersService.getAll(),
-      this.newsService.getAll()
-    ]).subscribe({
-      next: ([users, newsData]) => {
+    // Load users first, then initial news
+    this.usersService.getAll().subscribe({
+      next: (users) => {
         if (users) {
           users.forEach(u => this.usersMap.set(Number(u.id), u.name));
         }
-        this.news = newsData || [];
+        this.loadNews();
+      },
+      error: (err) => console.error('Failed to load users:', err)
+    });
+  }
+
+  loadNews(): void {
+    this.newsService.getAllWithPagination(this.page, this.searchText).subscribe({
+      next: (resp) => {
+        this._news = resp.body || [];
+        this.totalItems = Number(resp.headers.get('X-Total-Count')) || 0;
         this.cdr.markForCheck();
       },
       error: (err) => {
-        console.error('Failed to load data:', err);
-        this.news = [];
+        console.error('Failed to load news:', err);
+        this._news = [];
+        this.totalItems = 0;
       }
     });
+  }
+
+  onPageChange(page: number): void {
+    this.page = page;
+    this.loadNews();
   }
 
   getAuthorName(authorId: number): string {
     return this.usersMap.get(Number(authorId)) || 'Unknown';
   }
 
-  filteredNews(): any[] {
-    if (!this.news) return [];
-    return this.news.filter(n => n.title && n.title.toLowerCase().includes(this.searchText.toLowerCase()));
-  }
+
 
   canEdit(item: any): boolean {
     return this.loggedUser && Number(item.author_id) === Number(this.loggedUser.id);
@@ -70,14 +91,15 @@ export class NewsListComponent implements OnInit {
       alert('Please login first.');
       return;
     }
-    const item = this.news.find(n => n.id === id);
+    const item = this._news.find(n => n.id === id);
     if (item && !this.canEdit(item)) {
       alert('You cannot delete this news.');
       return;
     }
     if (confirm('Are you sure you want to delete this news?')) {
       this.newsService.delete(id).subscribe(() => {
-        this.news = this.news.filter(n => n.id !== id);
+        this._news = this._news.filter(n => n.id !== id);
+        this.loadNews(); // Reload to refresh pagination
       });
     }
   }
