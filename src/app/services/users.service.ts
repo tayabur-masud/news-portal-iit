@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class UsersService {
-  private usersUrl = 'http://localhost:3000/users';
+  private usersUrl = `${environment.apiUrl}/users`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getAll(): Observable<any[]> { return this.http.get<any[]>(this.usersUrl); }
   getById(id: number): Observable<any> { return this.http.get<any>(`${this.usersUrl}/${id}`); }
