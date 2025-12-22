@@ -6,6 +6,10 @@ import { NewsService } from '../../services/news.service';
 import { AuthService } from '../../services/auth.service';
 import { UsersService } from '../../services/users.service';
 import { forkJoin } from 'rxjs';
+import { User } from '../../models/user.model';
+import { News } from '../../models/news.model';
+import { NewsComment } from '../../models/comment.model';
+import { CommentsService } from '../../services/comments.service';
 
 @Component({
   selector: 'app-news-detail',
@@ -14,14 +18,15 @@ import { forkJoin } from 'rxjs';
   templateUrl: './news-detail.component.html'
 })
 export class NewsDetailComponent implements OnInit {
-  news: any;
-  usersMap = new Map<number, string>();
+  news: News | null = null;
+  usersMap = new Map<string, string>();
   commentText = '';
 
   constructor(
     private route: ActivatedRoute,
     private newsService: NewsService,
     private usersService: UsersService,
+    private commentsService: CommentsService,
     private auth: AuthService,
     private cdr: ChangeDetectorRef
   ) { }
@@ -32,7 +37,7 @@ export class NewsDetailComponent implements OnInit {
       console.error('No ID provided');
       return;
     }
-    const id = +idParam;
+    const id = idParam;
 
     // Load users first, then news detail — ensures users map is populated before rendering
     forkJoin([
@@ -41,7 +46,7 @@ export class NewsDetailComponent implements OnInit {
     ]).subscribe({
       next: ([users, newsData]) => {
         if (users) {
-          users.forEach(u => this.usersMap.set(Number(u.id), u.name));
+          users.forEach(u => this.usersMap.set(u.id, u.name));
         }
         this.news = newsData;
         this.cdr.markForCheck();
@@ -52,29 +57,32 @@ export class NewsDetailComponent implements OnInit {
     });
   }
 
-  getAuthorName(authorId: number): string {
-    return this.usersMap.get(Number(authorId)) || 'Unknown';
+  getAuthorName(authorId: string | number): string {
+    return this.usersMap.get(authorId.toString()) || 'Unknown';
   }
 
-  getUserName(userId: number): string {
-    return this.usersMap.get(Number(userId)) || 'Unknown';
+  getUserName(userId: string | number): string {
+    return this.usersMap.get(userId.toString()) || 'Unknown';
   }
 
   addComment(): void {
     if (!this.commentText.trim()) { alert('Comment text cannot be empty.'); return; }
     const user = this.auth.getLoggedUser();
-    if (!user) { alert('Please login first.'); return; }
+    if (!user || !this.news) { alert('Please login first.'); return; }
 
-    const newComment = {
-      id: Date.now(),
+    const newComment: Partial<NewsComment> = {
       text: this.commentText.trim(),
-      user_id: user.id,
-      timestamp: new Date().toISOString()
+      authorId: user.id,
+      authorName: user.name,
+      newsId: this.news.id,
+      createdAt: new Date().toISOString()
     };
-    const updatedComments = [...(this.news.comments || []), newComment];
 
-    this.newsService.update(this.news.id, { comments: updatedComments }).subscribe(() => {
-      this.news.comments = updatedComments;
+    this.commentsService.create(newComment).subscribe((savedComment: NewsComment) => {
+      if (this.news) {
+        this.news.comments = [...(this.news.comments || []), savedComment];
+        this.news.noOfComments = (this.news.noOfComments || 0) + 1;
+      }
       this.commentText = '';
     });
   }

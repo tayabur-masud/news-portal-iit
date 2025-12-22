@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NewsService } from '../../services/news.service';
 import { AuthService } from '../../services/auth.service';
+import { News } from '../../models/news.model';
 
 @Component({
   selector: 'app-news-edit',
@@ -12,7 +13,7 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './news-edit.component.html'
 })
 export class NewsEditComponent implements OnInit {
-  news: any = { title: '', body: '' };
+  news: News | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -23,7 +24,7 @@ export class NewsEditComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    const id = +this.route.snapshot.paramMap.get('id')!;
+    const id = this.route.snapshot.paramMap.get('id')!;
     this.newsService.getById(id).subscribe({
       next: (data) => {
         console.log('Edit News - ID:', id);
@@ -31,8 +32,8 @@ export class NewsEditComponent implements OnInit {
         const user = this.auth.getLoggedUser();
         console.log('Edit News - Logged User:', user);
 
-        if (!user || Number(data.author_id) !== Number(user.id)) {
-          console.warn('Edit News - Unauthorized:', { author: data.author_id, user: user?.id });
+        if (!user || data.authorId.toString() !== user.id.toString()) {
+          console.warn('Edit News - Unauthorized:', { author: data.authorId, user: user?.id });
           alert('You cannot edit this news!');
           this.router.navigate(['/news']);
           return;
@@ -46,6 +47,7 @@ export class NewsEditComponent implements OnInit {
   }
 
   save(): void {
+    if (!this.news) return;
     if (!this.news.title.trim()) { alert('Title cannot be empty.'); return; }
     if ((this.news.body || '').trim().length < 20) { alert('Body must be at least 20 characters.'); return; }
     this.newsService.update(this.news.id, { title: this.news.title.trim(), body: this.news.body.trim() })

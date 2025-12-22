@@ -1,14 +1,15 @@
 import { Injectable } from '@angular/core';
+import { User } from '../models/user.model';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private userKey = 'loggedUser';
 
-  login(user: any) {
+  login(user: User) {
     localStorage.setItem(this.userKey, JSON.stringify(user));
   }
 
-  getLoggedUser(): any | null {
+  getLoggedUser(): User | null {
     const val = localStorage.getItem(this.userKey);
     return val ? JSON.parse(val) : null;
   }

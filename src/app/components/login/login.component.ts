@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { UsersService } from '../../services/users.service';
 import { Router } from '@angular/router';
+import { User } from '../../models/user.model';
 
 @Component({
   selector: 'app-login',
@@ -12,10 +13,10 @@ import { Router } from '@angular/router';
   templateUrl: './login.component.html'
 })
 export class LoginComponent implements OnInit {
-  users: any[] = [];
-  selectedUser: any;
+  users: User[] = [];
+  selectedUser: User | undefined;
 
-  constructor(private usersService: UsersService, private auth: AuthService, private router: Router) {}
+  constructor(private usersService: UsersService, private auth: AuthService, private router: Router) { }
 
   ngOnInit(): void {
     this.usersService.getAll().subscribe(users => this.users = users);

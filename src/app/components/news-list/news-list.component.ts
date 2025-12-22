@@ -7,6 +7,8 @@ import { NewsService } from '../../services/news.service';
 import { AuthService } from '../../services/auth.service';
 import { UsersService } from '../../services/users.service';
 import { forkJoin } from 'rxjs';
+import { User } from '../../models/user.model';
+import { News } from '../../models/news.model';
 
 @Component({
   selector: 'app-news-list',
@@ -16,9 +18,9 @@ import { forkJoin } from 'rxjs';
   styleUrl: './news-list.component.css'
 })
 export class NewsListComponent implements OnInit {
-  _news: any[] = [];
-  usersMap = new Map<number, string>();
-  loggedUser: any | null = null;
+  _news: News[] = [];
+  usersMap = new Map<string, string>();
+  loggedUser: User | null = null;
 
   _searchText = '';
   page = 1;
@@ -49,7 +51,7 @@ export class NewsListComponent implements OnInit {
     this.usersService.getAll().subscribe({
       next: (users) => {
         if (users) {
-          users.forEach(u => this.usersMap.set(Number(u.id), u.name));
+          users.forEach(u => this.usersMap.set(u.id, u.name));
         }
         this.loadNews();
       },
@@ -60,8 +62,8 @@ export class NewsListComponent implements OnInit {
   loadNews(): void {
     this.newsService.getAllWithPagination(this.page, this.limit, this.searchText).subscribe({
       next: (resp) => {
-        this._news = resp.body || [];
-        this.totalItems = Number(resp.headers.get('X-Total-Count')) || 0;
+        this._news = resp.items || [];
+        this.totalItems = resp.totalCount || 0;
         this.cdr.markForCheck();
       },
       error: (err) => {
@@ -77,29 +79,27 @@ export class NewsListComponent implements OnInit {
     this.loadNews();
   }
 
-  getAuthorName(authorId: number): string {
-    return this.usersMap.get(Number(authorId)) || 'Unknown';
+  getAuthorName(authorId: string | number): string {
+    return this.usersMap.get(authorId.toString()) || 'Unknown';
   }
 
-
-
-  canEdit(item: any): boolean {
-    return this.loggedUser && Number(item.author_id) === Number(this.loggedUser.id);
+  canEdit(item: News): boolean {
+    return this.loggedUser !== null && item.authorId.toString() === this.loggedUser.id.toString();
   }
 
-  delete(id: number): void {
+  delete(id: string): void {
     if (!this.loggedUser) {
       alert('Please login first.');
       return;
     }
-    const item = this._news.find(n => n.id === id);
+    const item = this._news.find(n => n.id.toString() === id.toString());
     if (item && !this.canEdit(item)) {
       alert('You cannot delete this news.');
       return;
     }
     if (confirm('Are you sure you want to delete this news?')) {
       this.newsService.delete(id).subscribe(() => {
-        this._news = this._news.filter(n => n.id !== id);
+        this._news = this._news.filter(n => n.id.toString() !== id.toString());
         this.loadNews(); // Reload to refresh pagination
       });
     }

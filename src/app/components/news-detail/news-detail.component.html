@@ -1,44 +1,47 @@
+@if (news) {
 <div class="card shadow-lg" style="border-radius: 10px; border: none;">
   <div class="card-body p-4">
     <div class="mb-4">
-      <h2 class="card-title mb-2" style="font-weight: 700; font-size: 2rem;">{{news?.title}}</h2>
+      <h2 class="card-title mb-2" style="font-weight: 700; font-size: 2rem;">{{news.title}}</h2>
       <div class="text-muted d-flex gap-2" style="font-size: 0.95rem;">
-        <span>👤 By <strong>{{getAuthorName(news?.author_id)}}</strong></span>
+        <span>👤 By <strong>{{getAuthorName(news.authorId)}}</strong></span>
         <span>•</span>
-        <span>📅 {{news?.id}}</span>
+        <span>📅 {{news.createdAt | date:'dd MMM yyyy, h:mm a'}}</span>
       </div>
     </div>
 
     <div class="card-text bg-light p-3 mb-4" style="border-radius: 8px; line-height: 1.8;">
-      {{news?.body}}
+      {{news.body}}
     </div>
 
     <hr class="my-4">
 
     <div class="mb-4">
-      <h5 class="mb-3" style="font-weight: 600;">💬 Comments ({{news?.comments?.length || 0}})</h5>
-      @if (news?.comments?.length) {
-        @for (c of news.comments; track $index) {
-          <div class="mb-3">
-            <div class="card p-3" style="border-left: 3px solid #0d6efd; border-radius: 6px; background-color: #f8f9fa;">
-              <div class="d-flex justify-content-between align-items-start mb-2">
-                <strong>{{getUserName(c.user_id)}}</strong>
-                <small class="text-muted">{{c.timestamp}}</small>
-              </div>
-              <p class="mb-0 text-secondary">{{c.text}}</p>
-            </div>
+      <h5 class="mb-3" style="font-weight: 600;">💬 Comments ({{news.noOfComments}})</h5>
+      @if (news.comments?.length) {
+      @for (c of news.comments; track $index) {
+      <div class="mb-3">
+        <div class="card p-3" style="border-left: 3px solid #0d6efd; border-radius: 6px; background-color: #f8f9fa;">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <strong>{{c.authorName}}</strong>
+            <small class="text-muted">{{c.createdAt | date:'dd MMM yyyy, h:mm a'}}</small>
           </div>
-        }
+          <p class="mb-0 text-secondary">{{c.text}}</p>
+        </div>
+      </div>
+      }
       } @else {
-        <p class="text-muted text-center py-3">No comments yet. Be the first to comment!</p>
+      <p class="text-muted text-center py-3">No comments yet. Be the first to comment!</p>
       }
     </div>
 
     <div class="mt-4 pt-3 border-top">
       <h6 class="mb-3" style="font-weight: 600;">✍️ Add a Comment</h6>
       <div class="d-flex gap-2">
-        <input [(ngModel)]="commentText" class="form-control" placeholder="Write your comment here..." style="border-radius: 6px;">
-        <button class="btn btn-primary" (click)="addComment()" style="border-radius: 6px; padding: 0.5rem 1.5rem;">Submit</button>
+        <input [(ngModel)]="commentText" class="form-control" placeholder="Write your comment here..."
+          style="border-radius: 6px;">
+        <button class="btn btn-primary" (click)="addComment()"
+          style="border-radius: 6px; padding: 0.5rem 1.5rem;">Submit</button>
       </div>
     </div>
 
@@ -47,3 +50,4 @@
     </div>
   </div>
 </div>
+}

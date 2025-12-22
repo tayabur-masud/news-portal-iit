@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NewsService } from '../../services/news.service';
 import { AuthService } from '../../services/auth.service';
+import { News } from '../../models/news.model';
 
 @Component({
   selector: 'app-news-create',
@@ -24,11 +25,11 @@ export class NewsCreateComponent {
     const user = this.auth.getLoggedUser();
     if (!user) { alert('Please login first.'); return; }
 
-    const payload = {
+    const payload: Partial<News> = {
       title: this.title.trim(),
       body: this.body.trim(),
-      author_id: Number(user.id),
-      comments: []
+      authorId: user.id.toString(),
+      noOfComments: 0
     };
     this.newsService.create(payload).subscribe(() => this.router.navigate(['/news']));
   }
