@@ -6,7 +6,6 @@ import { NewsService } from '../../services/news.service';
 import { AuthService } from '../../services/auth.service';
 import { UsersService } from '../../services/users.service';
 import { forkJoin } from 'rxjs';
-import { User } from '../../models/user.model';
 import { News } from '../../models/news.model';
 import { NewsComment } from '../../models/comment.model';
 import { CommentsService } from '../../services/comments.service';
@@ -67,13 +66,10 @@ export class NewsDetailComponent implements OnInit {
 
   addComment(): void {
     if (!this.commentText.trim()) { alert('Comment text cannot be empty.'); return; }
-    const user = this.auth.getLoggedUser();
-    if (!user || !this.news) { alert('Please login first.'); return; }
+    if (!this.news) { alert('Please login first.'); return; }
 
     const newComment: Partial<NewsComment> = {
       text: this.commentText.trim(),
-      authorId: user.id,
-      authorName: user.name,
       newsId: this.news.id,
       createdAt: new Date().toISOString()
     };

@@ -12,7 +12,7 @@
               d="M2 3h10v2H2V3zm0 3h4v3H2V6zm0 4h4v1H2v-1zm0 2h4v1H2v-1zm5-6h2v1H7V6zm3 0h2v1h-2V6zM7 8h2v1H7V8zm3 0h2v1h-2V8zm-3 2h2v1H7v-1zm3 0h2v1h-2v-1zm-3 2h2v1H7v-1zm3 0h2v1h-2v-1z" />
           </svg>
         </span>
-        NewsPortal
+        IIT News Portal
       </a>
       <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,12 +20,16 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto align-items-center">
-          <li class="nav-item">
-            <a class="nav-link fw-medium px-3" routerLink="/news" routerLinkActive="active">Home</a>
+          @if (auth.isLoggedIn()) {
+          <li class="nav-item dropdown px-3">
+            <span class="fw-medium text-dark me-2">Hello, {{auth.getLoggedUser()?.name}}</span>
+            <button class="btn btn-outline-danger btn-sm rounded-pill" (click)="logout()">Logout</button>
           </li>
+          } @else {
           <li class="nav-item">
             <a class="btn btn-primary btn-sm px-4 rounded-pill ms-lg-3" routerLink="/login">Login</a>
           </li>
+          }
         </ul>
       </div>
     </div>
@@ -41,18 +45,8 @@
   <!-- Footer -->
   <footer class="bg-white border-top py-4 mt-auto">
     <div class="container">
-      <div class="row align-items-center justify-content-between">
-        <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-          <p class="mb-0 text-muted small">&copy; 2025 NewsPortal. All rights reserved.</p>
-        </div>
-        <div class="col-md-6 text-center text-md-end">
-          <ul class="list-inline mb-0">
-            <li class="list-inline-item"><a href="#" class="text-muted small text-decoration-none">Privacy Policy</a>
-            </li>
-            <li class="list-inline-item ms-3"><a href="#" class="text-muted small text-decoration-none">Terms of
-                Service</a></li>
-          </ul>
-        </div>
+      <div class="text-center">
+        <p class="mb-0 text-muted small">&copy; 2026 IIT News Portal. All rights reserved.</p>
       </div>
     </div>
   </footer>

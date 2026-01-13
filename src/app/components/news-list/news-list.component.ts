@@ -6,7 +6,6 @@ import { NgxPaginationModule } from 'ngx-pagination';
 import { NewsService } from '../../services/news.service';
 import { AuthService } from '../../services/auth.service';
 import { UsersService } from '../../services/users.service';
-import { forkJoin } from 'rxjs';
 import { User } from '../../models/user.model';
 import { News } from '../../models/news.model';
 

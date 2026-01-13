@@ -22,13 +22,10 @@ export class NewsCreateComponent {
   create(): void {
     if (!this.title.trim()) { alert('Title cannot be empty.'); return; }
     if ((this.body || '').trim().length < 20) { alert('Body must be at least 20 characters.'); return; }
-    const user = this.auth.getLoggedUser();
-    if (!user) { alert('Please login first.'); return; }
 
     const payload: Partial<News> = {
       title: this.title.trim(),
       body: this.body.trim(),
-      authorId: user.id.toString(),
       noOfComments: 0
     };
     this.newsService.create(payload).subscribe(() => this.router.navigate(['/news']));
